@@ -1,21 +1,60 @@
 var circles = [];
+var spots = [];
+var img;
+
+function preload() {
+  img = loadImage("image-lee.png"); //Lee
+  // img = loadImage("image-em.png"); //Emily
+}
 
 function setup() {
   createCanvas(800, 600);
-  circles.push(new Circle(random(width), random(height)));
+  pixelDensity(1);
+
+  img.loadPixels();
+
+  for (var y = 0; y < height; y++) {
+    for (var x = 0; x < width; x++) {
+      var index = (x + y * width)*4;
+      var r = img.pixels[index];
+      var g = img.pixels[index+1];
+      var b = img.pixels[index+2];
+      var a = img.pixels[index+3];
+
+      if (r > 0) {
+        var v = createVector(x, y);
+        spots.push(v);
+      }
+
+    }
+  }
 }
 
 function draw() {
-  background(51);
+  background(0);
 
-  createCircle();
+  var total = 20;
+  var count = 0;
+
+  while (count < total) {
+    createCircle();
+    count++;
+  }
 
   for (var i = 0; i < circles.length; i++) {
     if(circles[i].edges()) {
       circles[i].growing = false;
     }
     for (var j = 0; j < circles.length; j++) {
+      if(circles[i] != circles[j]) {
+        var d = dist(circles[i].x, circles[i].y, circles[j].x, circles[j].y);
+        var sums = circles[i].r + circles[j].r;
 
+        if (d < sums) {
+          circles[i].growing = false;
+          break;
+        }
+      }
     }
     circles[i].show();
     circles[i].grow();
@@ -23,8 +62,9 @@ function draw() {
 }
 
 function createCircle() {
-  var x = random(width);
-  var y = random(height);
+  var rndCircle = spots[floor(random(0, spots.length))];
+  var x = rndCircle.x;
+  var y = rndCircle.y;
 
   var valid = true;
 
